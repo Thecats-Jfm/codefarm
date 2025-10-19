@@ -1,4 +1,3 @@
-
 def try_harvest(do_action=True):
 	if can_harvest():
 		if do_action:
@@ -32,9 +31,9 @@ def sunflower_area(i, j):
 n = get_world_size()
 print("World size:", n)
 
-sunflower_size = 0
-pumpkin_size = n
-carrot_size = n
+sunflower_size = 1
+pumpkin_size = 8
+carrot_size = 7
 # bush_size = n*2 // 3
 bush_size = n
 
