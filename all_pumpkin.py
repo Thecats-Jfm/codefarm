@@ -1,3 +1,4 @@
+import utils
 
 def try_harvest(do_action=True):
 	if can_harvest():
@@ -16,58 +17,30 @@ def pumpkin_area(i, j, harvest_pumpkins_this_round):
 	plant(Entities.Pumpkin)
 	return ret
 
-def carrot_area(i, j):
-	if get_ground_type() != Grounds.Soil:
-		till()
-	try_harvest()
-	plant(Entities.Carrot)
-
-def sunflower_area(i, j):
-	if get_ground_type() != Grounds.Soil:
-		till()
-	try_harvest()
-	plant(Entities.Sunflower)
-
-
 n = get_world_size()
-print("World size:", n)
+pumpkin_to_plant_ori = []
+for i in range(n):
+	for j in range(n):
+		pumpkin_to_plant_ori.append( (i, j) )
 
-sunflower_size = 0
-pumpkin_size = n
-carrot_size = n
-# bush_size = n*2 // 3
-bush_size = n
 
-harvest_pumpkins_this_round = False
+pumpkin_to_plant = utils.copy_list(pumpkin_to_plant_ori)
+
 
 while True:
-	all_pumpkins_alive = True
-	print("New pass, harvest pumpkins this round:", harvest_pumpkins_this_round)
-	for j in range(get_world_size()):
-		for i in range(get_world_size()):
-			# while can_harvest():
-			#     pass
 
-			if i < carrot_size:
-				if j < sunflower_size:
-					sunflower_area(i, j)
-				elif j < pumpkin_size:
-					all_pumpkins_alive = pumpkin_area(i, j, harvest_pumpkins_this_round) and all_pumpkins_alive
-				else:
-					carrot_area(i, j)
+	while len(pumpkin_to_plant) > 0:
+		target = pumpkin_to_plant[0]
+		pumpkin_to_plant.pop(0)
+		path = utils.find_shortest_path(utils.get_pos(), target, n)
+		for dir in path:
+			move(dir)
+		ret = pumpkin_area(target[0], target[1], False)
+		if ret:
+			pass
+		else:
+			pumpkin_to_plant.append( target )
 
-			elif i < bush_size and (i+j) % 2 == 0:
-				# tree!!
-				if can_harvest():
-					harvest()
-				plant(Entities.Tree)
-			else:
-				# grass area
-				if can_harvest():
-					harvest()
-
-
-			move(North)
-		move(East)
-
-	harvest_pumpkins_this_round = all_pumpkins_alive and not harvest_pumpkins_this_round
+	print("All pumpkins ripe, harvested once, replanting all pumpkins")
+	harvest()
+	pumpkin_to_plant = utils.copy_list(pumpkin_to_plant_ori)
